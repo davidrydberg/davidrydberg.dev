@@ -1,0 +1,123 @@
+/* Workbench look: dark ground, monospace UI, prose only where text runs long. */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply antialiased;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-bg font-mono text-ink;
+  }
+
+  ::selection {
+    @apply bg-accent text-bg;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.accent');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+
+  /* Entry tags. One class per tag, fixed width so the log columns align. */
+  .tag {
+    @apply inline-block w-[7ch] shrink-0 font-medium;
+  }
+  .tag-TRIED { @apply text-dim; }
+  .tag-WORKS { @apply text-accent; }
+  .tag-BROKE { @apply text-[#f2a37a]; }
+  .tag-SHIPPED { @apply text-[#9ad0ff]; }
+  .tag-PARKED { @apply text-[#e6c96b]; }
+  .tag-DEAD { @apply text-faint line-through; }
+  .tag-NOTE { @apply text-dim; }
+
+  .status-Building { @apply text-accent; }
+  .status-Shipped { @apply text-[#9ad0ff]; }
+  .status-Parked { @apply text-[#e6c96b]; }
+  .status-Dead { @apply text-faint; }
+}
+
+/* ---- Motion. The page behaves like a shell session: prompts type in, output
+   streams in below them, a cursor blinks at the end. CSS only. ---- */
+@layer components {
+  /* Typed prompt: width grows in character steps. --n is the text length. */
+  .typed {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+    width: 0;
+    animation: typing 0.5s steps(var(--n)) forwards;
+    animation-delay: var(--delay, 0s);
+  }
+
+  /* Output rows: fade up with a per-row delay via --i. */
+  .stream > * {
+    opacity: 0;
+    animation: rise 0.35s ease-out forwards;
+    animation-delay: calc(var(--base, 0s) + var(--i, 0) * 45ms);
+  }
+
+  /* Blinking block cursor. */
+  .cursor::after {
+    content: '';
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    margin-left: 0.3ch;
+    vertical-align: text-bottom;
+    @apply bg-accent;
+    animation: blink 1s steps(1) infinite;
+  }
+
+  /* Status dot: pulses while Building, still otherwise. */
+  .dot::before {
+    content: '';
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.8ch;
+    border-radius: 9999px;
+    background: currentColor;
+    vertical-align: middle;
+  }
+  .status-Building.dot::before {
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  a {
+    transition: color 120ms ease-out;
+  }
+}
+
+@keyframes typing {
+  to { width: calc(var(--n) * 1ch); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes blink {
+  50% { opacity: 0; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typed { width: auto; animation: none; }
+  .stream > * { opacity: 1; animation: none; }
+  .cursor::after, .status-Building.dot::before { animation: none; }
+}

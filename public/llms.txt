@@ -1,0 +1,14 @@
+# David Rydberg
+
+> Founder building with AI all day. Agents, automations, code, experiments. I share what I'm trying, what works, and what breaks.
+
+This site is a portal to David Rydberg's work. It is a work in progress by design.
+
+## Pages
+
+- /: who David is, where he posts, what he is building, how to reach him.
+- /builds: one living page per project. Each Build has a Why, a Stack, and a Log of dated entries tagged TRIED, WORKS, BROKE, SHIPPED, PARKED, DEAD or NOTE.
+
+## Contact
+
+david@aiwithdavid.se
