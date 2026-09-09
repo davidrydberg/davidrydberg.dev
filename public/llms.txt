@@ -11,4 +11,4 @@ This site is a portal to David Rydberg's work. It is a work in progress by desig
 
 ## Contact
 
-david@aiwithdavid.se
+hello@davidrydberg.dev

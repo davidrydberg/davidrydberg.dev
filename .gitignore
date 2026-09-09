@@ -31,3 +31,5 @@ src/content/builds.generated.ts
 public/sitemap.xml
 
 .claude/settings.local.json
+.vercel
+.env*

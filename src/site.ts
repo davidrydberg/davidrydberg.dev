@@ -4,7 +4,7 @@
  */
 export const SITE_URL = 'https://davidrydberg.dev';
 export const SITE_NAME = 'David Rydberg';
-export const EMAIL = 'david@aiwithdavid.se';
+export const EMAIL = 'hello@davidrydberg.dev';
 
 /** Verbatim wherever David is introduced. Do not paraphrase. */
 export const IDENTITY_LINE =
