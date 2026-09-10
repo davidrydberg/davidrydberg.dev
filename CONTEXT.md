@@ -46,7 +46,7 @@ Aggregate counts of David's Claude Code sessions for one Build (sessions, tool c
 _Avoid_: analytics, telemetry, activity feed
 
 **Channel**:
-One of the places David posts: TikTok, YouTube, X, LinkedIn, plus GitHub (TaskifaiDavid) as the code channel; all five are linked from the Portal home.
+One of the places David posts: TikTok, YouTube, X, LinkedIn, plus GitHub (davidrydberg) as the code channel; all five are linked from the Portal home.
 _Avoid_: social, platform, socials
 
 ## Relationships

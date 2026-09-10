@@ -18,7 +18,7 @@ export interface Channel {
 
 /** Every place David posts. Order is display order. */
 export const CHANNELS: Channel[] = [
-  { key: 'github', handle: 'TaskifaiDavid', url: 'https://github.com/TaskifaiDavid' },
+  { key: 'github', handle: 'davidrydberg', url: 'https://github.com/davidrydberg' },
   { key: 'x', handle: '@davrydb', url: 'https://x.com/davrydb' },
   { key: 'linkedin', handle: 'davidrydb', url: 'https://www.linkedin.com/in/davidrydb/' },
   { key: 'youtube', handle: 'coming soon', url: null },
