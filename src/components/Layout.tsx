@@ -7,7 +7,7 @@ import { SITE_NAME } from '../site';
  * Vercel Web Analytics is cookieless, so it loads without a consent gate.
  */
 export const Layout = () => (
-  <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-5 py-8 text-[15px] leading-relaxed sm:px-8 sm:py-12">
+  <div className="mx-auto flex min-h-screen max-w-5xl flex-col px-5 py-8 text-[15px] leading-relaxed sm:px-8 sm:py-12">
     <header className="flex items-baseline justify-between gap-6 text-dim">
       <Link to="/" className="text-ink hover:text-accent">
         {SITE_NAME}

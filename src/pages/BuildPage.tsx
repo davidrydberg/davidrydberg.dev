@@ -8,7 +8,7 @@ const Section = ({ title, html }: { title: string; html: string }) =>
   html ? (
     <section className="mt-12">
       <h2 className="text-dim">{title}</h2>
-      <div className="prose mt-3 font-sans" dangerouslySetInnerHTML={{ __html: html }} />
+      <div className="prose mt-3 max-w-3xl font-sans" dangerouslySetInnerHTML={{ __html: html }} />
     </section>
   ) : null;
 
