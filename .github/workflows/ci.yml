@@ -1,0 +1,64 @@
+name: CI
+
+# Gates every change to the site. A push to `main` is what Vercel deploys, so
+# this workflow is the only thing standing between a bad commit and production.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push to the same branch makes the in-flight run pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: lint / typecheck / build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the Node major Vercel builds this project with. Keep the
+          # two in step, or a green CI run stops meaning the deploy will build.
+          node-version: '22'
+          cache: npm
+
+      # `npm ci` (not `install`) so the lockfile is authoritative and the same
+      # commit resolves to the same dependency tree next month.
+      - name: Install dependencies
+        run: npm ci
+
+      # src/content/builds.generated.ts and public/sitemap.xml are gitignored
+      # build artifacts. `npm run build` generates them itself, but lint and
+      # typecheck do not, so they have to be generated up front or typecheck
+      # fails on missing modules.
+      - name: Generate content
+        run: npm run content
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # Lets a reviewer download exactly what CI produced for a commit, and
+      # gives the rollback runbook a concrete artifact to point at.
+      - name: Upload dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist
+          retention-days: 7
