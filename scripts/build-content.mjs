@@ -5,8 +5,10 @@
  *     renders Why and Stack to HTML, parses the Log into tagged Entries,
  *     derives the Build status, and writes src/content/builds.generated.ts.
  *  2. Regenerates public/sitemap.xml from the static routes plus the Builds.
+ *  3. Writes public/health.json (served at /health) with the commit and build
+ *     time, so the live response proves which build is deployed.
  *
- * Both outputs are gitignored build artifacts. Edit the Markdown, not the
+ * All outputs are gitignored build artifacts. Edit the Markdown, not the
  * generated files. Format reference: content/builds/README.md.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
@@ -14,12 +16,14 @@ import { join } from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 import DOMPurify from 'isomorphic-dompurify';
+import { getBuildInfo } from './build-info.mjs';
 
 const SITE = 'https://davidrydberg.dev';
 const ROOT = process.cwd();
 const BUILDS_DIR = join(ROOT, 'content', 'builds');
 const GEN_FILE = join(ROOT, 'src', 'content', 'builds.generated.ts');
 const SITEMAP_FILE = join(ROOT, 'public', 'sitemap.xml');
+const HEALTH_FILE = join(ROOT, 'public', 'health.json');
 
 const TAGS = ['TRIED', 'WORKS', 'BROKE', 'SHIPPED', 'PARKED', 'DEAD', 'NOTE'];
 const STATUS_BY_TAG = { SHIPPED: 'Shipped', PARKED: 'Parked', DEAD: 'Dead' };
@@ -149,6 +153,13 @@ const writeSitemap = (builds) => {
   console.log(`[build-content] wrote sitemap with ${entries.length} URLs`);
 };
 
+const writeHealth = () => {
+  const info = { status: 'ok', ...getBuildInfo() };
+  writeFileSync(HEALTH_FILE, JSON.stringify(info, null, 2) + '\n', 'utf8');
+  console.log(`[build-content] wrote health.json (commit ${info.commit})`);
+};
+
 const builds = readBuilds();
 writeBuilds(builds);
 writeSitemap(builds);
+writeHealth();
