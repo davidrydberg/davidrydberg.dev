@@ -270,6 +270,23 @@ third-party actions.
   notification delivery has been observed, so do not assume a human is alerted.
   There is still no on-call human (see the DAV-5 plan, section 1.4).
 
+### Build identity check
+
+`.github/workflows/build-identity.yml` runs `scripts/check-build-identity.sh`
+every 15 minutes. It answers a question the uptime monitor cannot: is the live
+site the build `main` says it should be? It passes only if all three agree:
+`/health` `commit`, the `build-commit` meta tag on `/`, and the head of `main`.
+
+- On a mismatch it retries for 6 minutes (a normal deploy), then fails the run.
+  It opens no issue and is not counted as downtime; a red run means "the deploy
+  is stale or broken", so go to section 3.
+- Run it by hand: `bash scripts/check-build-identity.sh https://davidrydberg.dev`
+  (exit 0 and one `OK:` line on success; `FAIL:` and exit 1 otherwise).
+- It shares the uptime monitor's limits: best-effort cron, and no alert delivery
+  has been observed. Disable with `gh workflow disable build-identity.yml`.
+- What it misses: it does not measure latency or TLS, and it trusts that
+  `origin/main` is what should be live (a revert changes `main`, so it stays true).
+
 ## 5. What is deliberately not here
 
 - **No paging and no incident process in this runbook.** The uptime monitor

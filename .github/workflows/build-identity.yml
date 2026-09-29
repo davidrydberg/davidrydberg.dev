@@ -1,0 +1,35 @@
+name: Build identity
+
+# DAV-7. The Uptime workflow proves the site answers; this one proves it is
+# serving the build origin/main says it should. A 200 alone also comes from a
+# deploy that stopped working days ago (the edge served one object for 10 days
+# before /health existed).
+#
+# Passes only if /health status is ok, the page build-commit meta tag equals the
+# /health commit, and both equal the head of main. scripts/check-build-identity.sh
+# retries for 6 minutes so a normal deploy after a push is not an alert; a
+# mismatch that outlasts that fails the run. It opens no issue and is not charged
+# to the availability error budget: it is a deploy-freshness signal, not downtime.
+#
+# Rollback: delete this file. Nothing else depends on it.
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-identity
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: /health vs origin/main
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify build identity
+        run: bash scripts/check-build-identity.sh https://davidrydberg.dev
