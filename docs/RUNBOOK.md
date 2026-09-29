@@ -72,17 +72,26 @@ If CI is red, **do not merge.** Read the failing step:
 
 ### Verify the deploy landed
 
-Vercel takes roughly 1–2 minutes after the merge.
+Vercel takes roughly 1-2 minutes after the merge. A `200` from `/` does not
+prove the new build is live: the edge can serve a stale cached page for days.
+`/health` is generated at build time and is never cached, so it names the build.
 
 ```bash
-curl -sS -o /dev/null -w "status=%{http_code}\n" https://davidrydberg.dev/
+curl -sS --max-time 20 https://davidrydberg.dev/health
+git rev-parse --short=7 origin/main
 ```
 
-Expected:
+Expected: JSON with `"status": "ok"` and a `commit` equal to the second
+command's output. Until they match, the deploy has not landed (or the Vercel
+build failed and the previous deployment is still serving).
 
+Independent second signal, from the page a visitor actually receives:
+
+```bash
+curl -sS --max-time 20 https://davidrydberg.dev/ | grep -o '<meta name="build-commit"[^>]*>'
 ```
-status=200
-```
+
+Expected: `<meta name="build-commit" content="<same short SHA>">`.
 
 Anything other than `200` means the deploy is broken — go to section 3.
 
@@ -115,10 +124,11 @@ Then wait for Vercel to rebuild and confirm:
 
 ```bash
 sleep 30
-curl -sS -o /dev/null -w "status=%{http_code}\n" https://davidrydberg.dev/
+curl -sS --max-time 20 https://davidrydberg.dev/health
 ```
 
-Expected: `status=200`, and the bad change is gone from the served page.
+Expected: `"status": "ok"` and a `commit` equal to the revert commit's short SHA
+(`git rev-parse --short=7 origin/main`), so the bad change is gone.
 
 **Measured time to recover: ~17 seconds** from `git push` to the reverted
 content being served. This was timed on 2026-09-29 by deploying a marker to
