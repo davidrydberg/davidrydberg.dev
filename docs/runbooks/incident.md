@@ -68,8 +68,10 @@ curl -sS --max-time 20 https://davidrydberg.dev/health
 - The newest commit on `origin/main` is under 60 minutes old: **roll back.** Follow
   `docs/RUNBOOK.md` section 3, Option A (`git revert --no-edit <SHA>` then push).
   Measured recovery: about 17 seconds after the push, plus the time you take to type
-  it. If `main` is protected and rejects the push (branch protection is being added
-  in DAV-16), revert on a branch and merge it through a pull request.
+  it. `main` is protected (`docs/RUNBOOK.md` section 6) but admin bypass is on
+  deliberately, so the direct `git push origin main` of a revert is allowed as
+  break-glass. If it is rejected anyway, revert on a branch and merge it through a
+  pull request once `lint / typecheck / build` is green.
   **Never force-push `main`.**
 - No recent commit: rollback will not help, go to section 3. A static site that
   changed nothing and broke points at DNS, the certificate, or Vercel.

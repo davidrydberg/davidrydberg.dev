@@ -296,9 +296,9 @@ site the build `main` says it should be? It passes only if all three agree:
 
 ## 5. What is deliberately not here
 
-- **No paging and no incident process in this runbook.** The uptime monitor
-  above detects; it does not page anyone. Incident response is owned by SRE,
-  not by this runbook.
+- **No paging.** The uptime monitor above detects; it does not page anyone.
+  The incident process (confirm, roll back, diagnose, escalate) is in
+  [`docs/runbooks/incident.md`](runbooks/incident.md).
 - **No staging environment.** Vercel PR previews are the closest thing.
 - **No required reviewers.** No second human or agent reviewer exists, so a
   review requirement would be either bypassed or a deadlock.
