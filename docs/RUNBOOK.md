@@ -18,10 +18,10 @@ git push / merge to main
 Two things to understand before you touch production:
 
 - **CI and Vercel run in parallel, not in sequence.** GitHub Actions does not
-  gate the Vercel deploy. A push to `main` starts the deploy immediately, even
-  if CI is still running or has already failed. CI is a fast alarm, not a lock.
-  Until branch protection requiring the `lint / typecheck / build` check is
-  enabled on `main`, **the gate is you: open a PR and wait for green.**
+  gate the Vercel deploy itself. What stops a red change is branch protection
+  on `main` (section 6): a PR cannot merge until `lint / typecheck / build` is
+  green. Only an admin can bypass that, by pushing directly, and that is
+  reserved for rollback. A direct push to `main` still deploys even if CI fails.
 - **`main` is production.** There is no staging environment. Vercel builds
   preview deployments for pull requests; those are the only pre-production
   environment that exists today.
@@ -38,6 +38,10 @@ Two things to understand before you touch production:
 ## 2. Deploy a change
 
 Never push straight to `main`. Use a branch so CI runs before production does.
+This applies to agents too: agents push as the `davidrydberg` GitHub identity,
+which is an admin and can bypass branch protection, so the only thing stopping
+an agent from pushing to `main` is this rule. The one exception is rollback
+(section 3).
 
 ```bash
 git checkout -b my-change
@@ -99,7 +103,10 @@ Anything other than `200` means the deploy is broken — go to section 3.
 
 ### Option A — revert the commit (works today, no extra credentials)
 
-This is the supported rollback path right now. It is a roll *forward* to the
+This is the supported rollback path right now. It pushes directly to `main`,
+which branch protection allows only because admin bypass is enabled on purpose
+(section 6). It is the only situation where a direct push to `main` is right.
+It is a roll *forward* to the
 previous content: git reverts the bad commit, the push triggers a fresh Vercel
 build, and production returns to its prior state.
 
@@ -293,4 +300,64 @@ site the build `main` says it should be? It passes only if all three agree:
   above detects; it does not page anyone. Incident response is owned by SRE,
   not by this runbook.
 - **No staging environment.** Vercel PR previews are the closest thing.
-- **No branch protection on `main`** - see the warning in section 1.
+- **No required reviewers.** No second human or agent reviewer exists, so a
+  review requirement would be either bypassed or a deadlock.
+- **No admin enforcement on `main`.** Deliberate, see section 6.
+
+## 6. Branch protection on `main`
+
+Configured 2026-09-29 (DAV-16, decision on DAV-4: enable with admin bypass).
+This is what makes CI a lock instead of an alarm.
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| Required status check | `lint / typecheck / build` | A PR cannot merge while CI is red or missing |
+| `strict` (branch must be up to date) | `false` | PRs are small and sequential; forcing a rebase per merge is toil |
+| `enforce_admins` | `false` | Admin bypass is deliberate: rollback is `git revert && git push origin main` and must stay a fast break-glass path (MTTR over MTBF). The owner can also push to their own site |
+| Required PR reviews | none | No second reviewer exists |
+| Force pushes | blocked | History on `main` is what rollback relies on |
+| Branch deletion | blocked | |
+
+**Rules that follow from this:**
+
+- Normal changes go via PR and merge only when `lint / typecheck / build` is green.
+- A direct push to `main` is break-glass, for rollback only (section 3).
+- Agents push as the `davidrydberg` identity, so admin bypass means agents can
+  technically push to `main`. They must not, except for rollback. Nothing but
+  this rule enforces it.
+- The check name must match the job `name:` in `ci.yml` exactly. If you rename
+  the job, update the protection in the same change, or every PR will sit
+  "Expected" forever.
+
+**Inspect:**
+
+```bash
+gh api repos/davidrydberg/davidrydberg.dev/branches/main/protection \
+  --jq '{checks: .required_status_checks.contexts, strict: .required_status_checks.strict, enforce_admins: .enforce_admins.enabled, force_push: .allow_force_pushes.enabled, deletions: .allow_deletions.enabled}'
+```
+
+Expected: `{"checks":["lint / typecheck / build"],"deletions":false,"enforce_admins":false,"force_push":false,"strict":false}`
+
+**Re-apply** (idempotent):
+
+```bash
+gh api -X PUT repos/davidrydberg/davidrydberg.dev/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": {"strict": false, "contexts": ["lint / typecheck / build"]},
+  "enforce_admins": false,
+  "required_pull_request_reviews": null,
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
+JSON
+```
+
+**Remove protection entirely** (one call; use if CI itself is broken and blocking a rollback
+that admin bypass somehow cannot cover):
+
+```bash
+gh api -X DELETE repos/davidrydberg/davidrydberg.dev/branches/main/protection
+```
+
+Removing it also removes the force-push and deletion blocks. Re-apply straight after.
