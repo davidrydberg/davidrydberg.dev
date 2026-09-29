@@ -1,0 +1,40 @@
+name: Uptime
+
+# External uptime check for the DAV-5 SLO (99.9% / 30d). Runs on GitHub, so it
+# fails independently of Paperclip and of Vercel. A failed run is the alert:
+# GitHub emails the repo owner when a scheduled workflow fails.
+#
+# GitHub cron is best-effort. Runs are routinely delayed 5-15+ minutes under
+# load, so this does not guarantee the 5 minute detection target. `*/5` is the
+# shortest interval GitHub allows.
+#
+# Rollback: delete this file.
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL to check (override to force a failure without touching prod)
+        required: false
+        default: https://davidrydberg.dev/
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: HTTPS check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      URL: ${{ inputs.url || 'https://davidrydberg.dev/' }}
+
+    steps:
+      # -f fails on HTTP >= 400, -L follows the apex/www redirect, and the
+      # retries absorb a single dropped connection so one blip is not an alert.
+      # The body check makes a blank 200 from a broken deploy count as down.
+      - name: Fetch and verify
+        run: |
+          curl -fsSL --max-time 15 --retry 2 --retry-delay 5 -o page.html "$URL"
+          grep -q 'David Rydberg' page.html
