@@ -55,6 +55,12 @@ Expected from `gh pr checks --watch`:
 ✓  lint / typecheck / build  ...  https://github.com/davidrydberg/davidrydberg.dev/actions/runs/<id>/job/<id>
 ```
 
+A green run takes about 30 seconds.
+
+The gate has been verified to actually fail: a commit with a deliberate type
+error produced `X Typecheck`, skipped `Build`, and a run conclusion of
+`failure`. A gate nobody has seen go red is not a gate.
+
 If CI is red, **do not merge.** Read the failing step:
 
 - `Lint` fails → `npm run lint` locally, fix, push again.
@@ -108,13 +114,46 @@ To https://github.com/davidrydberg/davidrydberg.dev.git
 Then wait for Vercel to rebuild and confirm:
 
 ```bash
-sleep 90
+sleep 30
 curl -sS -o /dev/null -w "status=%{http_code}\n" https://davidrydberg.dev/
 ```
 
 Expected: `status=200`, and the bad change is gone from the served page.
 
-Time to recover: about 2 minutes, dominated by the Vercel rebuild.
+**Measured time to recover: ~17 seconds** from `git push` to the reverted
+content being served. This was timed on 2026-09-29 by deploying a marker to
+production and reverting it — see "Rollback drill" below. Budget a minute;
+it has been faster than that.
+
+To confirm you are looking at a fresh deploy rather than a cached response,
+check that `age` has reset and `etag` changed:
+
+```bash
+curl -sSI https://davidrydberg.dev/ | grep -iE '^(HTTP|etag|last-modified|age)'
+```
+
+Note that `etag` changes on **every** build even when content is unchanged:
+`vite-react-ssg` embeds a per-build nonce (`__VITE_REACT_SSG_HASH__`) in the
+HTML. A changed `etag` proves a redeploy happened, not that content changed.
+
+### Rollback drill (verified 2026-09-29)
+
+The procedure above is not theoretical. It was executed end to end against
+production:
+
+| Step | Commit | Result |
+| --- | --- | --- |
+| Deploy an invisible HTML marker to `main` | `dc249c3` | marker live in production after ~40s, `etag` `98c82567…` → `e3d50d58…` |
+| `git revert --no-edit dc249c3 && git push origin main` | `bdadb87` | marker gone after ~17s, `status=200`, `etag` → `998896a3…` |
+
+Verification that the rollback was complete, not just marker-free: a clean
+local build of `main` at `bdadb87` was compared byte-for-byte against the
+served page. The only difference was the per-build `__VITE_REACT_SSG_HASH__`
+nonce described above.
+
+Re-run this drill after any change to hosting, the build command, or the
+output directory. A rollback path that has not been exercised since the last
+infrastructure change is an assumption, not a procedure.
 
 **If the revert conflicts** (someone pushed on top of the bad commit), do not
 force-push `main`. Resolve the conflict in the revert commit:
