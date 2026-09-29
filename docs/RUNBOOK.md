@@ -197,9 +197,83 @@ the only rollback an agent can execute. The same rollback is also available by
 hand in the Vercel dashboard: **Deployments → pick the last good one →
 Promote to Production**.
 
-## 4. What is deliberately not here
+## 4. Uptime monitor
 
-- **No uptime check, no alerting, no incident process.** Nothing is watching
-  this site. Owned by SRE, not by this runbook.
+`.github/workflows/uptime.yml` checks production from GitHub's network, so it
+fails independently of Paperclip and of Vercel. It is the SLI from the DAV-5
+reliability plan (section 1.3), and SRE owns that definition.
+
+**What it checks.** `GET https://davidrydberg.dev/` passes only if all four hold:
+
+1. TLS is valid for the host (curl verifies the certificate; `-k` is never used)
+2. HTTP status is exactly `200` (redirects are not followed)
+3. the body contains the literal string `David Rydberg`
+4. the whole request finishes within 5 seconds (`curl --max-time 5`)
+
+**When.** Cron `*/5 * * * *`, plus manual runs. One failed check waits 60 s and
+retries once; only the second consecutive failure is an outage.
+
+**Where alerts appear.**
+
+- A GitHub issue labelled `outage`, titled `Outage: davidrydberg.dev <UTC time
+  of the first failed check>`, with the curl output in the body. While one is
+  open, further failures comment on it instead of opening a duplicate.
+- The run itself goes red in the Actions tab.
+- When a check passes again, the issue gets a `recovered <UTC>` comment and is
+  closed. The issue title time and the `recovered` time are the downtime to
+  charge to the error budget.
+
+```bash
+gh issue list --repo davidrydberg/davidrydberg.dev --label outage --state all
+gh run list --repo davidrydberg/davidrydberg.dev --workflow uptime.yml --limit 10
+```
+
+**Test the failure path without touching production.** Point it at a route that
+does not exist. It opens an `outage` issue after about 65 s and the run goes
+red. Then run it again with no `url` and it closes the issue.
+
+```bash
+gh workflow run uptime.yml --repo davidrydberg/davidrydberg.dev \
+  -f url=https://davidrydberg.dev/this-route-does-not-exist-monitor-test
+gh workflow run uptime.yml --repo davidrydberg/davidrydberg.dev
+```
+
+A manual run shares the same `outage` issue as the scheduled ones, so a test
+run made during a real outage will comment on, or close, the real issue.
+
+**Disable it.** Reversible, no commit needed:
+`gh workflow disable uptime.yml --repo davidrydberg/davidrydberg.dev`
+(re-enable with `gh workflow enable`). To remove it for good, delete
+`.github/workflows/uptime.yml` in a PR. Nothing else depends on it, and it makes
+no change to the site. The worst a bad edit can do is open a false `outage` issue.
+
+**Permissions.** `contents: read` and `issues: write` on the built-in
+`GITHUB_TOKEN`. No repository secrets, no personal access token, and no
+third-party actions.
+
+**Known limits. Read these before trusting it.**
+
+- **GitHub cron is best-effort.** Scheduled runs are delayed and sometimes
+  skipped under load, so the real interval is longer than 5 minutes. Do not
+  claim a 5 minute detection objective from this alone. Measure the gaps with
+  `gh run list --workflow uptime.yml --event schedule`.
+- **It goes silent after 60 days without repository activity.** GitHub disables
+  scheduled workflows on a repo with no activity for 60 days. Nothing here keeps
+  it alive; pushes to the repo do. This is a known limit, not solved. Check that
+  the newest scheduled run is recent, and re-enable with
+  `gh workflow enable uptime.yml` if it is not.
+- **It cannot see an outage while GitHub Actions is itself degraded.** That is
+  why the Paperclip routine from DAV-8 (option A) stays as a slow cross-check
+  with a different failure domain.
+- **An issue is not a page.** Whether a new `outage` issue or a failed run
+  emails anyone depends on that person's GitHub notification settings. No
+  notification delivery has been observed, so do not assume a human is alerted.
+  There is still no on-call human (see the DAV-5 plan, section 1.4).
+
+## 5. What is deliberately not here
+
+- **No paging and no incident process in this runbook.** The uptime monitor
+  above detects; it does not page anyone. Incident response is owned by SRE,
+  not by this runbook.
 - **No staging environment.** Vercel PR previews are the closest thing.
-- **No branch protection on `main`** — see the warning in section 1.
+- **No branch protection on `main`** - see the warning in section 1.
