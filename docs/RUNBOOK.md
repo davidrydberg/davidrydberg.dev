@@ -263,7 +263,15 @@ third-party actions.
 - **GitHub cron is best-effort.** Scheduled runs are delayed and sometimes
   skipped under load, so the real interval is longer than 5 minutes. Do not
   claim a 5 minute detection objective from this alone. Measure the gaps with
-  `gh run list --workflow uptime.yml --event schedule`.
+  `gh run list --workflow uptime.yml --event schedule`. **Measured
+  (DAV-21, 2026-09-29 21:20Z to 2026-09-30 07:35Z):** 2 scheduled `Uptime` runs
+  in about 10 h against roughly 120 configured slots, at 00:34:59Z and
+  05:54:52Z (a 5 h 20 min gap), and the first arrived 3 h 14 min after merge.
+  Actions, the workflow and the default branch were all correct, and a canary
+  on an hourly cron was also late or dropped, so this is GitHub's scheduler,
+  not something the repo can fix. Treat this monitor as a best-effort extra
+  signal, not a detector. The Paperclip routine is the only check with a
+  bounded interval (DAV-30).
 - **It goes silent after 60 days without repository activity.** GitHub disables
   scheduled workflows on a repo with no activity for 60 days. Nothing here keeps
   it alive; pushes to the repo do. This is a known limit, not solved. Check that
