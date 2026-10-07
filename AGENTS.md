@@ -19,6 +19,7 @@ English only. Built for fun, openly a work in progress.
 | `src/pages/` | Home, BuildsIndex, BuildPage |
 | `src/components/` | Layout, Log, BuildRow, Prompt, ChannelIcon, motion helpers |
 | `src/index.css` | Palette, tag colours, all motion |
+| `api/subscribe.ts` | Newsletter signup, the only server code. Needs `RESEND_API_KEY` in Vercel |
 
 ## Commands
 
