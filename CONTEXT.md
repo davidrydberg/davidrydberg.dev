@@ -49,6 +49,10 @@ _Avoid_: analytics, telemetry, activity feed
 One of the places David posts: TikTok, YouTube, X, LinkedIn, plus GitHub (davidrydberg) as the code channel; all five are linked from the Portal home.
 _Avoid_: social, platform, socials
 
+**Newsletter**:
+Email to people who signed up on the Portal, sent through Resend when a new Build or a notable Entry lands; no fixed schedule.
+_Avoid_: updates, digest, mailing list
+
 ## Relationships
 
 - A **Build** has exactly one **Log**; its **Build status** is derived from the latest SHIPPED, PARKED or DEAD **Entry**, defaulting to Building.

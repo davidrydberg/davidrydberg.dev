@@ -3,6 +3,7 @@ import { BUILDS } from '../content/builds.generated';
 import { BuildRow } from '../components/BuildRow';
 import { Prompt } from '../components/Prompt';
 import { ChannelIcon } from '../components/ChannelIcon';
+import { Subscribe } from '../components/Subscribe';
 import { row, stream } from '../components/motion';
 import { CHANNELS, EMAIL, IDENTITY_LINE, SITE_NAME, SITE_URL } from '../site';
 
@@ -65,8 +66,15 @@ export const Home = () => (
     </section>
 
     <section className="mt-14">
-      <Prompt text="cat contact" delay={1.9} />
-      <p className="stream mt-3" style={stream(2.4)}>
+      <Prompt text="subscribe" delay={1.9} />
+      <div className="stream mt-3" style={stream(2.4)}>
+        <Subscribe />
+      </div>
+    </section>
+
+    <section className="mt-14">
+      <Prompt text="cat contact" delay={2.2} />
+      <p className="stream mt-3" style={stream(2.7)}>
         <a href={`mailto:${EMAIL}`} className="cursor text-ink underline-offset-4 hover:underline">
           {EMAIL}
         </a>
