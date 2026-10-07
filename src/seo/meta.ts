@@ -18,6 +18,12 @@ export const routeMeta = {
     description: 'Living pages for the things I build with AI: what I tried, what works, what broke.',
     canonical: `${SITE_URL}/builds`,
   },
+  '/privacy': {
+    title: `Privacy | ${SITE_NAME}`,
+    description: 'What happens to your email address when you subscribe, and your rights.',
+    canonical: `${SITE_URL}/privacy`,
+    noindex: true,
+  },
 } satisfies Record<string, RouteMeta>;
 
 export type RoutePath = keyof typeof routeMeta;

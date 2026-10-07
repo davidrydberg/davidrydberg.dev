@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { BuildsIndex } from './pages/BuildsIndex';
 import { BuildPage } from './pages/BuildPage';
+import { Privacy } from './pages/Privacy';
 import { BUILDS } from './content/builds.generated';
 
 export const routes: RouteRecord[] = [
@@ -12,6 +13,7 @@ export const routes: RouteRecord[] = [
     children: [
       { index: true, element: <Home /> },
       { path: 'builds', element: <BuildsIndex /> },
+      { path: 'privacy', element: <Privacy /> },
       ...BUILDS.map((build) => ({
         path: build.path.slice(1),
         element: <BuildPage build={build} />,

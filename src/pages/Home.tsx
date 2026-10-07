@@ -4,6 +4,7 @@ import { BuildRow } from '../components/BuildRow';
 import { Prompt } from '../components/Prompt';
 import { ChannelIcon } from '../components/ChannelIcon';
 import { Subscribe } from '../components/Subscribe';
+import { SubscribePopup } from '../components/SubscribePopup';
 import { row, stream } from '../components/motion';
 import { CHANNELS, EMAIL, IDENTITY_LINE, SITE_NAME, SITE_URL } from '../site';
 
@@ -25,6 +26,7 @@ const personJsonLd = {
 export const Home = () => (
   <>
     <Seo route="/" jsonLd={personJsonLd} />
+    <SubscribePopup />
     <div className="stream" style={stream(0)}>
       <h1 className="text-2xl font-medium" style={row(0)}>{SITE_NAME}</h1>
       <p className="mt-3 max-w-xl font-sans text-base text-dim" style={row(1)}>{IDENTITY_LINE}</p>
@@ -68,7 +70,7 @@ export const Home = () => (
     <section className="mt-14">
       <Prompt text="subscribe" delay={1.9} />
       <div className="stream mt-3" style={stream(2.4)}>
-        <Subscribe />
+        <Subscribe source="home" />
       </div>
     </section>
 

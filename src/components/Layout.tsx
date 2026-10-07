@@ -21,7 +21,12 @@ export const Layout = () => (
     <main className="flex-1 pt-14">
       <Outlet />
     </main>
-    <footer className="pt-16 text-xs text-faint">work in progress, on purpose.</footer>
+    <footer className="flex justify-between gap-6 pt-16 text-xs text-faint">
+      <span>work in progress, on purpose.</span>
+      <Link to="/privacy" className="hover:text-ink">
+        privacy
+      </Link>
+    </footer>
     <Analytics />
   </div>
 );
