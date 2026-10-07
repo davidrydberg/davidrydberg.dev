@@ -15,7 +15,7 @@ export const Subscribe = ({
   source,
   onSubscribed,
 }: {
-  source: 'popup' | 'home';
+  source: 'popup';
   onSubscribed?: () => void;
 }) => {
   const [email, setEmail] = useState('');
