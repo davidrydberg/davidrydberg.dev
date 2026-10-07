@@ -101,6 +101,11 @@
   }
 }
 
+/* Newsletter popup slides up into the corner. */
+.popup {
+  animation: rise 0.35s ease-out;
+}
+
 @keyframes typing {
   to { width: calc(var(--n) * 1ch); }
 }
@@ -119,5 +124,5 @@
 @media (prefers-reduced-motion: reduce) {
   .typed { width: auto; animation: none; }
   .stream > * { opacity: 1; animation: none; }
-  .cursor::after, .status-Building.dot::before { animation: none; }
+  .cursor::after, .status-Building.dot::before, .popup { animation: none; }
 }
