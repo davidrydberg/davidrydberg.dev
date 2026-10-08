@@ -45,7 +45,7 @@ export const Subscribe = ({
 
   return (
     <form onSubmit={submit} className="max-w-xl">
-      <p className="font-sans text-dim">New Builds and Log Entries by email. No schedule, unsubscribe any time.</p>
+      <p className="font-sans text-dim">Weekly, by email. Unsubscribe any time.</p>
       <div className="mt-3 flex items-center gap-3 border-b border-line focus-within:border-accent">
         <span className="text-accent" aria-hidden="true">&gt;</span>
         <label htmlFor={`subscribe-email-${source}`} className="sr-only">Email</label>
