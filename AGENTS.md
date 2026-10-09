@@ -14,6 +14,7 @@ English only. Built for fun, openly a work in progress.
 | Path | What |
 |---|---|
 | `content/builds/*.md` | The Builds. Filename is the slug and URL |
+| `scripts/showcase.sh` | Generates Showcase Builds from the public daily logs and opens a PR. Prompt in `scripts/showcase-prompt.md` |
 | `scripts/build-content.mjs` | Compiles Builds to `src/content/builds.generated.ts` and writes the sitemap |
 | `src/site.ts` | Domain, identity line, channels, email |
 | `src/pages/` | Home, BuildsIndex, BuildPage |
@@ -34,7 +35,8 @@ npm run lint
 
 - The identity line in `src/site.ts` is verbatim. Never paraphrase it.
 - Nothing on the site is presented as finished. No "complete", "done", "final".
-- Log Entries are hand-written. Never generate them from commits or activity.
+- Hand-written Builds (no `source: logs`) are David's. Never generate or edit their Entries.
+- Showcase Builds (`source: logs`) come only from `scripts/showcase.sh`, which reads `public/` in the private repo davidrydberg/logs and opens a PR. Never read the private days, never name a client in them, never merge the PR without David.
 - Generated files are gitignored. Edit the Markdown, not `builds.generated.ts` or `sitemap.xml`.
 - The domain is written in three places: `src/site.ts`, `scripts/build-content.mjs`, `public/robots.txt`.
 - Workspace rules from `~/David/AGENTS.md` apply: no em dashes, ASCII only, no secrets, no agent co-author.

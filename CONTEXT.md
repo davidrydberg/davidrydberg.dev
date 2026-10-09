@@ -34,12 +34,20 @@ The heart of a Build: dated entries, newest first, each recording what was tried
 _Avoid_: changelog, updates, blog, timeline
 
 **Entry**:
-One hand-written, dated, tagged line in a Build's Log (tags: TRIED, WORKS, BROKE, SHIPPED, PARKED, DEAD, NOTE), optionally with a short detail beneath; never generated from commits.
+One dated, tagged line in a Build's Log (tags: TRIED, WORKS, BROKE, SHIPPED, PARKED, DEAD, NOTE), optionally with a short detail beneath; hand-written by David, or generated from the public daily logs in a **Showcase Build**.
 _Avoid_: post, update, commit, activity
 
 **Build status**:
 One of Building (actively worked on), Shipped (in real use, still updated), Parked (not touched now, not dead), Dead (abandoned, kept for what broke).
 _Avoid_: done, finished, complete, archived
+
+**Daily log**:
+One day of David's GitHub activity, summarised in the private repo davidrydberg/logs; its public version (`public/`, clients anonymised) is the only part the Portal reads.
+_Avoid_: changelog, activity feed, commit history
+
+**Showcase Build**:
+A **Build** generated from the public **Daily logs** (frontmatter `source: logs`): one thing David built that a Builder learns from, never one Build per repo or per day; proposed as a PR, published only when David merges it.
+_Avoid_: auto-post, feed, recap
 
 **Session stats**:
 Aggregate counts of David's Claude Code sessions for one Build (sessions, tool calls, reverts), shown on the Build as proof of AI-assisted development; never content from the sessions.
@@ -70,9 +78,9 @@ _Avoid_: updates, digest, mailing list
 
 ## Flagged ambiguities
 
-- GitHub commit activity as Log content was considered and rejected 2026-09-09: repos are private, so it degrades to counts, which is filler.
+- GitHub commit activity as Log content was considered and rejected 2026-09-09: repos are private, so it degrades to counts, which is filler. Revisited 2026-10-09: the **Daily logs** summarise what was built, not counts, so **Showcase Builds** are generated from their public version (docs/adr/0004).
 
-- Kaffekassan was assumed to be David's company - corrected 2026-09-09: it is a client where David consults. Named clients allowed on the Portal: Lampgrossen, BIBBI, Kaffekassan. Any other client is anonymised.
+- Named clients allowed on the Portal: Lampgrossen, BIBBI. Any other client is anonymised, and **Showcase Builds** anonymise every client. Changed 2026-10-09.
 - TikTok and YouTube handles are not created yet (aiwithdavid handles are retired); X (davrydb) and LinkedIn (davidrydb) stand. Open.
 - First **Build** to publish is undecided; the Portal ships as a skeleton with the Build structure in place.
 
