@@ -46,6 +46,7 @@ export const Layout = () => {
                 if (pathname === '/') window.scrollTo(0, 0);
               }}
             >
+              <span className="brand-dot" aria-hidden="true" />
               {SITE_NAME}
             </Link>
             <nav className="nav-links" aria-label="Primary">

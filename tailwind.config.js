@@ -6,14 +6,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Mirrors the CSS variables in src/index.css. Black, white, grey only.
-        bg: '#ffffff',
-        panel: '#ffffff',
-        line: '#e6e6e6',
-        ink: '#111111',
-        dim: '#555555',
-        faint: '#6b6b6b',
-        accent: '#111111',
+        // Mirrors the CSS variables in src/index.css. Dark ground, one lime accent.
+        bg: '#0a0b0a',
+        panel: '#0e100c',
+        line: '#262a20',
+        ink: '#ecefe6',
+        dim: '#d5d9cb',
+        faint: '#8b9080',
+        accent: '#c8ff2e',
       },
       fontFamily: {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
@@ -23,12 +23,12 @@ export default {
         DEFAULT: {
           css: {
             maxWidth: 'none',
-            '--tw-prose-body': theme('colors.ink'),
+            '--tw-prose-body': theme('colors.dim'),
             '--tw-prose-headings': theme('colors.ink'),
             '--tw-prose-links': theme('colors.ink'),
             '--tw-prose-bold': theme('colors.ink'),
             '--tw-prose-code': theme('colors.ink'),
-            '--tw-prose-pre-bg': '#f6f6f6',
+            '--tw-prose-pre-bg': theme('colors.panel'),
             '--tw-prose-pre-code': theme('colors.ink'),
             '--tw-prose-hr': theme('colors.line'),
             '--tw-prose-quotes': theme('colors.dim'),
@@ -37,11 +37,17 @@ export default {
             '--tw-prose-counters': theme('colors.faint'),
             fontFamily: theme('fontFamily.sans').join(', '),
             a: { textDecoration: 'underline', textUnderlineOffset: '3px' },
-            'a:hover': { color: theme('colors.ink') },
+            'a:hover': { color: theme('colors.accent') },
             code: { fontWeight: '400' },
             'code::before': { content: 'none' },
             'code::after': { content: 'none' },
-            h2: { fontSize: '1.05rem', fontWeight: '500', letterSpacing: '-0.02em' },
+            h2: {
+              fontFamily: '"Space Grotesk", Inter, system-ui, sans-serif',
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              letterSpacing: '-0.03em',
+              lineHeight: '1.2',
+            },
           },
         },
       }),

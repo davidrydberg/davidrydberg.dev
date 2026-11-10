@@ -33,7 +33,7 @@ export const BuildPage = ({ build }: { build: Build }) => (
 
       <dl className="facts">
         <dt>status</dt>
-        <dd className="status mono">{build.status}</dd>
+        <dd className="status mono" data-status={build.status}>{build.status}</dd>
         <dt>started</dt>
         <dd>
           <time dateTime={build.started}>{build.started}</time>

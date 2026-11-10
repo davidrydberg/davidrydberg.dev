@@ -17,7 +17,7 @@ export const Log = ({ entries }: { entries: Entry[] }) => {
               {e.date}
               {e.time ? ` ${e.time}` : null}
             </time>
-            <span className={`tag tag-${e.tag}`}>{e.tag}</span>
+            <span className="tag" data-tag={e.tag}>{e.tag}</span>
             <p className="log-text">{e.text}</p>
           </div>
           {e.detailHtml ? (
