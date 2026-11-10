@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Seo } from '../seo/Seo';
+import { Contributions } from '../components/Contributions';
 import { SubscribePopup } from '../components/SubscribePopup';
 import { HOME_BUILDS, SELECTED_WORK, type HomeBuild } from '../content/home';
-import { BUILDS } from '../content/builds.generated';
 import { CHANNELS, EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '../site';
 
 const HERO_LINKS = [
@@ -11,9 +11,6 @@ const HERO_LINKS = [
   { key: 'x', label: 'X' },
   { key: 'linkedin', label: 'LinkedIn' },
 ] as const;
-
-/** Entries shown in the hero from the most recently updated Build. */
-const HERO_LOG_ENTRIES = 4;
 
 const BUILD_FILTERS = ['All', ...new Set(HOME_BUILDS.map((build) => build.status))];
 
@@ -44,13 +41,11 @@ const BuildName = ({ build }: { build: HomeBuild }) =>
 
 /**
  * The portal home: who David is, selected work, public builds, about, contact.
- * Copy and layout follow the approved mockup.
  */
 export const Home = () => {
   const [subscribeRequest, setSubscribeRequest] = useState(0);
   const [buildFilter, setBuildFilter] = useState('All');
 
-  const latestBuild = BUILDS[0];
   const shownBuilds = HOME_BUILDS.filter(
     (build) => buildFilter === 'All' || build.status === buildFilter,
   );
@@ -63,7 +58,7 @@ export const Home = () => {
       <SubscribePopup openRequest={subscribeRequest} />
 
       <section className="hero">
-        <div className="wrap hero-grid">
+        <div className="wrap">
           <div className="hero-copy">
             <p className="kicker">
               Portal / work in progress, on purpose
@@ -94,28 +89,8 @@ export const Home = () => {
                 {EMAIL}
               </a>
             </div>
+            <Contributions />
           </div>
-          {latestBuild ? (
-            <div className="hero-log">
-              <div className="hero-log-head">
-                <span>builds/{latestBuild.slug} / log</span>
-                <span className="status">{latestBuild.status}</span>
-              </div>
-              <ol>
-                {latestBuild.log.slice(0, HERO_LOG_ENTRIES).map((entry, i) => (
-                  <li key={i}>
-                    <time dateTime={entry.date}>{entry.date}</time>
-                    <span className="tag" data-tag={entry.tag}>{entry.tag}</span>
-                    <span className="log-text">{entry.text}</span>
-                  </li>
-                ))}
-              </ol>
-              <Link className="hero-log-more" to={latestBuild.path}>
-                <span>read the whole log</span>
-                <span aria-hidden="true">-&gt;</span>
-              </Link>
-            </div>
-          ) : null}
         </div>
       </section>
 

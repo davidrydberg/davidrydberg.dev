@@ -34,3 +34,4 @@ public/health.json
 .claude/settings.local.json
 .vercel
 .env*
+!.env.example
