@@ -18,7 +18,7 @@ English only. Built for fun, openly a work in progress.
 | `scripts/build-content.mjs` | Compiles Builds to `src/content/builds.generated.ts` and writes the sitemap |
 | `src/site.ts` | Domain, identity line, channels, email |
 | `src/pages/` | Home, BuildsIndex, BuildPage |
-| `src/components/` | Layout, Log, BuildRow, Prompt, ChannelIcon, motion helpers |
+| `src/components/` | Layout, Log, BuildRow, Subscribe, SubscribePopup |
 | `src/index.css` | Palette, tag colours, all motion |
 | `api/subscribe.ts` | Newsletter signup, the only server code. Needs `RESEND_API_KEY` in Vercel |
 

@@ -6,18 +6,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Workbench palette: near-black ground, warm off-white ink, one green
-        // accent. Tag colours live in index.css as CSS classes.
-        bg: '#0c0d10',
-        panel: '#131519',
-        line: '#24272e',
-        ink: '#e8e6e1',
-        dim: '#8e929b',
-        faint: '#5c606a',
-        accent: '#8fe3a8',
+        // Mirrors the CSS variables in src/index.css. Black, white, grey only.
+        bg: '#ffffff',
+        panel: '#ffffff',
+        line: '#e6e6e6',
+        ink: '#111111',
+        dim: '#555555',
+        faint: '#6b6b6b',
+        accent: '#111111',
       },
       fontFamily: {
-        mono: ['"JetBrains Mono"', '"SF Mono"', 'Menlo', 'Consolas', 'monospace'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
         sans: ['Inter', 'system-ui', '-apple-system', '"Segoe UI"', 'sans-serif'],
       },
       typography: ({ theme }) => ({
@@ -26,10 +25,10 @@ export default {
             maxWidth: 'none',
             '--tw-prose-body': theme('colors.ink'),
             '--tw-prose-headings': theme('colors.ink'),
-            '--tw-prose-links': theme('colors.accent'),
+            '--tw-prose-links': theme('colors.ink'),
             '--tw-prose-bold': theme('colors.ink'),
-            '--tw-prose-code': theme('colors.accent'),
-            '--tw-prose-pre-bg': theme('colors.panel'),
+            '--tw-prose-code': theme('colors.ink'),
+            '--tw-prose-pre-bg': '#f6f6f6',
             '--tw-prose-pre-code': theme('colors.ink'),
             '--tw-prose-hr': theme('colors.line'),
             '--tw-prose-quotes': theme('colors.dim'),
@@ -42,6 +41,7 @@ export default {
             code: { fontWeight: '400' },
             'code::before': { content: 'none' },
             'code::after': { content: 'none' },
+            h2: { fontSize: '1.05rem', fontWeight: '500', letterSpacing: '-0.02em' },
           },
         },
       }),

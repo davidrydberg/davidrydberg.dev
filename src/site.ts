@@ -6,9 +6,15 @@ export const SITE_URL = 'https://davidrydberg.dev';
 export const SITE_NAME = 'David Rydberg';
 export const EMAIL = 'hello@davidrydberg.dev';
 
-/** Verbatim wherever David is introduced. Do not paraphrase. */
+/**
+ * Verbatim. Do not paraphrase.
+ * The homepage introduction is the approved mockup copy, not this line.
+ */
 export const IDENTITY_LINE =
   "Founder building with AI all day. Agents, automations, code, experiments. I share what I'm trying, what works, and what breaks.";
+
+/** Homepage meta description. Wording matches the approved mockup. */
+export const SITE_DESCRIPTION = "David Rydberg. I'm a self-taught builder in Malmö.";
 
 export interface Channel {
   key: string;

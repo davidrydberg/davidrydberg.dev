@@ -7,9 +7,9 @@ type State = 'idle' | 'sending' | 'ok' | 'error';
 const CONSENT_TEXT = 'Send me the newsletter by email. I can unsubscribe at any time.';
 
 /**
- * Newsletter signup, styled as a shell input. Posts to api/subscribe, which
- * adds the address to the Resend Newsletter segment. GDPR: the consent box is
- * unticked by default and required, and the privacy notice is one click away.
+ * Newsletter signup. Posts to api/subscribe, which adds the address to the
+ * Resend Newsletter segment. The consent box is unticked by default and
+ * required, and the privacy notice is one click away.
  */
 export const Subscribe = ({
   source,
@@ -40,15 +40,22 @@ export const Subscribe = ({
   };
 
   if (state === 'ok') {
-    return <p className="text-accent">ok. you are on the list.</p>;
+    return (
+      <p className="form-ok" role="status">
+        You are on the list.
+      </p>
+    );
   }
 
   return (
-    <form onSubmit={submit} className="max-w-xl">
-      <p className="font-sans text-dim">New Builds and Log Entries by email. No schedule, unsubscribe any time.</p>
-      <div className="mt-3 flex items-center gap-3 border-b border-line focus-within:border-accent">
-        <span className="text-accent" aria-hidden="true">&gt;</span>
-        <label htmlFor={`subscribe-email-${source}`} className="sr-only">Email</label>
+    <form onSubmit={submit} className="subscribe">
+      <p id="subscribe-blurb" className="subscribe-blurb">
+        New Builds and Log Entries by email. No schedule, unsubscribe any time.
+      </p>
+      <div className="subscribe-row">
+        <label htmlFor={`subscribe-email-${source}`} className="sr-only">
+          Email
+        </label>
         <input
           id={`subscribe-email-${source}`}
           type="email"
@@ -57,35 +64,30 @@ export const Subscribe = ({
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="min-w-0 flex-1 bg-transparent py-2 text-ink placeholder:text-faint focus:outline-none"
+          className="subscribe-input"
         />
-        <button
-          type="submit"
-          disabled={state === 'sending'}
-          className="text-dim hover:text-accent disabled:text-faint"
-        >
-          {state === 'sending' ? 'sending...' : 'subscribe'}
+        <button type="submit" disabled={state === 'sending'} className="subscribe-button">
+          {state === 'sending' ? 'Sending...' : 'Subscribe'}
         </button>
       </div>
-      <label className="mt-3 flex items-start gap-3 font-sans text-sm text-dim">
+      <label className="consent">
         <input
           type="checkbox"
           required
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          className="mt-1 accent-[#8fe3a8]"
         />
         <span>
-          {CONSENT_TEXT} See the{' '}
-          <Link to="/privacy" className="underline underline-offset-4 hover:text-ink">
-            privacy notice
-          </Link>
-          .
+          {CONSENT_TEXT} See the <Link to="/privacy">privacy notice</Link>.
         </span>
       </label>
       {/* Honeypot: hidden from people, filled by bots. */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-      {state === 'error' && <p className="mt-2 text-[#f2a37a]">error: that did not work. try again, or email me.</p>}
+      {state === 'error' && (
+        <p className="form-error" role="alert">
+          That did not work. Try again, or email me.
+        </p>
+      )}
     </form>
   );
 };

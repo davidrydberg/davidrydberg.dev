@@ -35,7 +35,7 @@ npm run lint
 | `scripts/build-content.mjs` | Compiles Builds, writes the sitemap |
 | `src/site.ts` | Domain, identity line, channels, email |
 | `src/pages/` | Home, BuildsIndex, BuildPage |
-| `src/components/` | Layout, Log, BuildRow, Prompt, ChannelIcon |
+| `src/components/` | Layout, Log, BuildRow, Subscribe, SubscribePopup |
 | `src/index.css` | Palette, tag colours, motion |
 | `CONTEXT.md` | The vocabulary this project uses |
 | `docs/adr/` | Decisions and why |
