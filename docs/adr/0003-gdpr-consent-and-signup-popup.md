@@ -9,7 +9,7 @@ David wants the newsletter signup to appear as a popup on the home page, and to 
 
 ## Decision
 
-- The popup is a corner card that slides in 4 seconds after load, not a page-blocking modal. It shows once per visitor: closing it or subscribing sets a localStorage flag.
+- Updated 2026-11-10: the signup is a compact bar along the bottom of the viewport, not a corner card and not a timer. On a small screen it never opens by itself. On a wider screen it opens only after a real scroll, near the bottom of the page, once the hero has left the screen, so it does not cover the hero. The Contact link still opens it. Closing it or subscribing sets a localStorage flag, and that unsolicited open happens once.
 - Every signup form has a required consent checkbox, unticked by default, linking to a privacy notice at `/privacy`.
 - The API rejects any signup without `consent: true`, and stores `consent_at`, `consent_text` and `consent_source` on the Resend contact as the record of consent.
 - Signing up again with an existing address records the new consent and resubscribes it.
