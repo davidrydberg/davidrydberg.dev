@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Subscribe } from './Subscribe';
 
 // Remembers that this visitor closed the popup or subscribed, so it shows once.
@@ -15,59 +15,75 @@ const markSeen = () => {
 };
 
 /**
- * Newsletter signup that slides in on the home page, once per visitor. A
- * corner card, not a page-blocking modal, so the page stays usable.
+ * Newsletter signup that slides in on the home page, once per visitor.
+ * A corner card, not a page-blocking modal, so the page stays usable.
+ * `openRequest` increments when the contact link asks for it now.
  */
-export const SubscribePopup = () => {
+export const SubscribePopup = ({ openRequest }: { openRequest: number }) => {
   const [open, setOpen] = useState(false);
+  const seen = useRef(false);
+  const opener = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    let seen = false;
     try {
-      seen = localStorage.getItem(SEEN_KEY) === '1';
+      seen.current = localStorage.getItem(SEEN_KEY) === '1';
     } catch {
       // Treat blocked storage as not seen.
     }
-    if (seen) return;
-    const timer = setTimeout(() => setOpen(true), DELAY_MS);
+    if (seen.current) return;
+    const timer = setTimeout(() => {
+      if (!seen.current) setOpen(true);
+    }, DELAY_MS);
     return () => clearTimeout(timer);
   }, []);
 
-  const close = () => {
-    markSeen();
-    setOpen(false);
-  };
+  useEffect(() => {
+    if (openRequest < 1) return;
+    opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setOpen(true);
+    const timer = window.setTimeout(() => {
+      document.getElementById('subscribe-email-popup')?.focus();
+    }, 30);
+    return () => clearTimeout(timer);
+  }, [openRequest]);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      seen.current = true;
       markSeen();
       setOpen(false);
+      opener.current?.focus();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  const close = () => {
+    seen.current = true;
+    markSeen();
+    setOpen(false);
+    opener.current?.focus();
+  };
+
   if (!open) return null;
 
   return (
     <div
+      id="newsletter"
       role="dialog"
       aria-labelledby="subscribe-popup-title"
-      className="popup fixed inset-x-3 bottom-3 z-50 border border-line bg-panel p-5 shadow-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[26rem]"
+      aria-modal="false"
+      className="popup"
     >
-      <div className="flex items-baseline justify-between gap-4">
-        <h2 id="subscribe-popup-title" className="text-dim">
-          <span className="text-faint">$ </span>subscribe
-        </h2>
-        <button onClick={close} aria-label="Close" className="text-faint hover:text-ink">
-          [x]
+      <div className="popup-head">
+        <h2 id="subscribe-popup-title">Subscribe</h2>
+        <button type="button" onClick={close} className="popup-close">
+          Close
         </button>
       </div>
-      <div className="mt-3">
-        <Subscribe source="popup" onSubscribed={markSeen} />
-      </div>
+      <Subscribe source="popup" onSubscribed={markSeen} />
     </div>
   );
 };

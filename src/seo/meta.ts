@@ -1,4 +1,4 @@
-import { SITE_URL, SITE_NAME, IDENTITY_LINE } from '../site';
+import { SITE_URL, SITE_NAME, SITE_DESCRIPTION } from '../site';
 
 export interface RouteMeta {
   title: string;
@@ -10,7 +10,7 @@ export interface RouteMeta {
 export const routeMeta = {
   '/': {
     title: SITE_NAME,
-    description: IDENTITY_LINE,
+    description: SITE_DESCRIPTION,
     canonical: `${SITE_URL}/`,
   },
   '/builds': {
