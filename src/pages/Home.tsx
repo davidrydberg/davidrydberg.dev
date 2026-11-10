@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Seo } from '../seo/Seo';
 import { SubscribePopup } from '../components/SubscribePopup';
 import { HOME_BUILDS, SELECTED_WORK, type HomeBuild } from '../content/home';
+import { BUILDS } from '../content/builds.generated';
 import { CHANNELS, EMAIL, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '../site';
 
 const HERO_LINKS = [
@@ -10,6 +11,14 @@ const HERO_LINKS = [
   { key: 'x', label: 'X' },
   { key: 'linkedin', label: 'LinkedIn' },
 ] as const;
+
+/** Entries shown in the hero from the most recently updated Build. */
+const HERO_LOG_ENTRIES = 4;
+
+const BUILD_FILTERS = ['All', ...new Set(HOME_BUILDS.map((build) => build.status))];
+
+/** What the About copy says surrounds the model. */
+const HARNESS = ['prompts', 'tools', 'evals', 'gates', 'review loops'];
 
 const personJsonLd = {
   '@context': 'https://schema.org',
@@ -39,6 +48,12 @@ const BuildName = ({ build }: { build: HomeBuild }) =>
  */
 export const Home = () => {
   const [subscribeRequest, setSubscribeRequest] = useState(0);
+  const [buildFilter, setBuildFilter] = useState('All');
+
+  const latestBuild = BUILDS[0];
+  const shownBuilds = HOME_BUILDS.filter(
+    (build) => buildFilter === 'All' || build.status === buildFilter,
+  );
 
   const openNewsletter = () => setSubscribeRequest((n) => n + 1);
 
@@ -48,32 +63,59 @@ export const Home = () => {
       <SubscribePopup openRequest={subscribeRequest} />
 
       <section className="hero">
-        <div className="wrap">
-          <h1>
-            <span className="h1-name">{SITE_NAME}</span>
-            <span className="h1-line">I'm a self-taught builder in Malmö.</span>
-          </h1>
-          <p className="sub">
-            I code every day, mostly with AI, and keep a public log of what works and what breaks.
-          </p>
-          <ul className="hero-links" aria-label="Channels">
-            {HERO_LINKS.map((item) => {
-              const channel = CHANNELS.find((c) => c.key === item.key);
-              if (!channel?.url) return null;
-              return (
-                <li key={item.key}>
-                  <a href={channel.url} target="_blank" rel="me noopener noreferrer">
-                    {item.label}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-          <div className="ctas">
-            <a className="email-link" href={`mailto:${EMAIL}`}>
-              {EMAIL}
-            </a>
+        <div className="wrap hero-grid">
+          <div className="hero-copy">
+            <p className="kicker">
+              Portal / work in progress, on purpose
+              <span className="cursor" aria-hidden="true" />
+            </p>
+            <h1>
+              <span className="h1-name">{SITE_NAME}</span>
+              <span className="h1-line">I'm a self-taught builder in Malmö.</span>
+            </h1>
+            <p className="sub">
+              I code every day, mostly with AI, and keep a public log of what works and what breaks.
+            </p>
+            <ul className="hero-links" aria-label="Channels">
+              {HERO_LINKS.map((item) => {
+                const channel = CHANNELS.find((c) => c.key === item.key);
+                if (!channel?.url) return null;
+                return (
+                  <li key={item.key}>
+                    <a href={channel.url} target="_blank" rel="me noopener noreferrer">
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="ctas">
+              <a className="email-link" href={`mailto:${EMAIL}`}>
+                {EMAIL}
+              </a>
+            </div>
           </div>
+          {latestBuild ? (
+            <div className="hero-log">
+              <div className="hero-log-head">
+                <span>builds/{latestBuild.slug} / log</span>
+                <span className="status">{latestBuild.status}</span>
+              </div>
+              <ol>
+                {latestBuild.log.slice(0, HERO_LOG_ENTRIES).map((entry, i) => (
+                  <li key={i}>
+                    <time dateTime={entry.date}>{entry.date}</time>
+                    <span className="tag" data-tag={entry.tag}>{entry.tag}</span>
+                    <span className="log-text">{entry.text}</span>
+                  </li>
+                ))}
+              </ol>
+              <Link className="hero-log-more" to={latestBuild.path}>
+                <span>read the whole log</span>
+                <span aria-hidden="true">-&gt;</span>
+              </Link>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -81,23 +123,22 @@ export const Home = () => {
         <div className="wrap">
           <div className="section-head">
             <div>
-              <p className="section-kicker mono">Work</p>
+              <p className="section-kicker mono">01 / Work</p>
               <h2 id="work-heading">Selected work</h2>
             </div>
             <p className="section-note">An overview.</p>
           </div>
           <ul className="work">
-            {SELECTED_WORK.map((item) => (
+            {SELECTED_WORK.map((item, i) => (
               <li key={item.title}>
+                <span className="work-num" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <div className="work-top">
-                  <h3>{item.title}</h3>
-                  {item.when ? (
-                    <time className="when mono" dateTime={item.when}>
-                      {item.when}
-                    </time>
-                  ) : null}
+                  <p className="context">{item.context}</p>
+                  {item.when ? <time dateTime={item.when}>{item.when}</time> : null}
                 </div>
-                <p className="context">{item.context}</p>
+                <h3>{item.title}</h3>
                 <p className="what">{item.what}</p>
                 <div className="meta">
                   {item.tags.map((tag) => (
@@ -110,20 +151,32 @@ export const Home = () => {
         </div>
       </section>
 
-      <section className="block" id="builds" aria-labelledby="builds-heading">
+      <section className="block tinted" id="builds" aria-labelledby="builds-heading">
         <div className="wrap">
           <div className="section-head">
             <div>
-              <p className="section-kicker mono">Builds</p>
+              <p className="section-kicker mono">02 / Builds</p>
               <h2 id="builds-heading">Builds & public tools</h2>
             </div>
-            <p className="section-note">Living pages and repos.</p>
+            <div className="filters" role="group" aria-label="Filter builds by status">
+              {BUILD_FILTERS.map((filter) => (
+                <button
+                  key={filter}
+                  type="button"
+                  className="filter"
+                  aria-pressed={filter === buildFilter}
+                  onClick={() => setBuildFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
           <ul className="builds">
-            {HOME_BUILDS.map((build) => (
+            {shownBuilds.map((build) => (
               <li className="build" key={build.name}>
                 <BuildName build={build} />
-                <span className="status mono">{build.status}</span>
+                <span className="status mono" data-status={build.status}>{build.status}</span>
                 <span className="desc">{build.description}</span>
                 {build.repo ? (
                   <span className="end">
@@ -146,20 +199,27 @@ export const Home = () => {
         <div className="wrap">
           <div className="section-head">
             <div>
-              <p className="section-kicker mono">About</p>
+              <p className="section-kicker mono">03 / About</p>
               <h2 id="about-heading">About</h2>
             </div>
           </div>
-          <div className="about">
-            <p>
-              I'm a self-taught builder in Sweden. I code every day, and I do most of that work with
-              AI agents beside me. It isn't a demo. It's how the work gets done.
-            </p>
-            <p className="belief">
-              Core belief: it isn't the model, it's the harness. The prompts, tools, evals, gates and
-              review loops around the model are what make something shippable.
-            </p>
-            <p>The build logs on this site are that record: what works, and what breaks.</p>
+          <div className="about-grid">
+            <div className="about">
+              <p>
+                I'm a self-taught builder in Sweden. I code every day, and I do most of that work with
+                AI agents beside me. It isn't a demo. It's how the work gets done.
+              </p>
+              <p className="belief">
+                Core belief: it isn't the model, it's the harness. The prompts, tools, evals, gates and
+                review loops around the model are what make something shippable.
+              </p>
+              <p>The build logs on this site are that record: what works, and what breaks.</p>
+            </div>
+            <ul className="harness" aria-label="The harness">
+              {HARNESS.map((part) => (
+                <li key={part}>{part}</li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
@@ -168,7 +228,7 @@ export const Home = () => {
         <div className="wrap">
           <div className="section-head">
             <div>
-              <p className="section-kicker mono">Contact</p>
+              <p className="section-kicker mono">04 / Contact</p>
               <h2 id="contact-heading">Get in touch.</h2>
             </div>
           </div>
@@ -177,11 +237,9 @@ export const Home = () => {
               If a repetitive workflow is slowing your team down, email me. I'll tell you whether an
               agent can take it.
             </p>
-            <div className="ctas">
-              <a className="email-link" href={`mailto:${EMAIL}`}>
-                {EMAIL}
-              </a>
-            </div>
+            <a className="email-big" href={`mailto:${EMAIL}`}>
+              {EMAIL}
+            </a>
             <p className="newsletter">
               Want new builds by email?{' '}
               <a href="#newsletter" onClick={(event) => { event.preventDefault(); openNewsletter(); }}>

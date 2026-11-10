@@ -7,7 +7,7 @@ export const BuildRow = ({ build }: { build: Build }) => (
     <Link to={build.path} className="name">
       {build.slug}
     </Link>
-    <span className="status mono">{build.status}</span>
+    <span className="status mono" data-status={build.status}>{build.status}</span>
     <span className="desc">{build.oneliner}</span>
     <time dateTime={build.updated} className="end mono">
       {build.updated}
